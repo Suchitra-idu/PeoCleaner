@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react'; 
-import { Calendar, DollarSign, Clock } from 'lucide-react'; 
+import { Clock } from 'lucide-react'; 
 import { formatAddress, formatPrice, calculateBookingPrice, formatDate } from '../utils/helpers';
 /**
  * BookingForm component allows users to book or edit a service booking.
@@ -87,18 +87,12 @@ function BookingForm({
             });
         }
         
-        // if (validationErrors.services) {
-
-        // }
     };
 
     // Handle tiee slot click
     const handleSlotClick = (slotId) => {
         setSelectedSlotId(slotId.toString());
-        // // Clear validation error for date_time when changed
-        // if (validationErrors.date_time) {
-        //      // Let parent handle full validation on submit
-        // }
+
     };
 
 
@@ -291,7 +285,6 @@ function BookingForm({
         {/* Calculated Price Display */}
         {selectedServiceIds.length > 0 && services && ( 
              <div className="flex items-center justify-end text-lg font-semibold text-gray-800 mt-4 pt-4 border-t border-gray-200">
-                 <DollarSign className="mr-2 h-6 w-6 text-green-600" />
                  Total Price: <span className="ml-2 text-green-600">{formatPrice(totalPrice)}</span>
              </div>
         )}

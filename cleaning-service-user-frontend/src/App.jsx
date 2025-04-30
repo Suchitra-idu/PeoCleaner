@@ -6,8 +6,8 @@ import Footer from './components/Footer';
 import Dashboard from './components/Dashboard';
 import BookingForm from './components/BookingForm';
 import UserProfileModal from './components/UserProfileModal';
-import Message from './components/Message'; // Import Message component
-import Confirmation from './components/Confirmation'; // Import Confirmation component
+import Message from './components/Message'; 
+import Confirmation from './components/Confirmation'; 
 
 import API from './api/api';
 import { isFutureDateTime, validateAddress, calculateBookingPrice } from './utils/helpers';
@@ -165,7 +165,7 @@ export default function CleaningServiceApp() {
    */
   const handleSubmit = async (isUsingProfileAddress, selectedServiceIds, selectedSlotId) => {
     if (!validateForm(isUsingProfileAddress, selectedServiceIds, selectedSlotId)) {
-        console.log("Validation failed", validationErrors);
+        // console.log("Validation failed", validationErrors);
         setMessage({ text: "Please fix the errors in the form.", type: 'warning' }); 
         return;
     }
@@ -206,7 +206,8 @@ export default function CleaningServiceApp() {
         if (editingBooking) {
           // Editing an existing booking
           bookingToSave = {
-            ...editingBooking,                 
+            ...editingBooking,     
+            userId: userProfile.user_id,          
             customer_name: customerNameToSave, 
             address: addressToSave,           
             services: servicesToSave,          
@@ -216,6 +217,7 @@ export default function CleaningServiceApp() {
         } else {
           // Creating a new booking
           bookingToSave = {
+            userId: userProfile.user_id,
             customer_name: customerNameToSave, 
             address: addressToSave,            
             services: servicesToSave,         
@@ -224,7 +226,7 @@ export default function CleaningServiceApp() {
         }
         
 
-        console.log("Attempting to save booking:", bookingToSave);
+        // console.log("Attempting to save booking:", bookingToSave);
         await API.saveBooking(bookingToSave);
 
         // Refetching data for the current user and available slots
@@ -235,8 +237,7 @@ export default function CleaningServiceApp() {
         setBookings(updatedBookings);
         setAvailableSlots(updatedSlots);
 
-        setMessage({ text: `Booking ${editingBooking ? 'updated' : 'created'} successfully!`, type: 'success' }); // Success message
-
+        setMessage({ text: `Booking ${editingBooking ? 'updated' : 'created'} successfully!`, type: 'success' }); 
         // Reset form state
         setFormData({
           customer_name: '',
@@ -250,7 +251,7 @@ export default function CleaningServiceApp() {
 
     } catch (error) {
         console.error("Failed to save booking:", error);
-        setMessage({ text: "Failed to save booking. " + (error.message || "Please try again."), type: 'error' }); // Error message
+        setMessage({ text: "Failed to save booking. " + (error.message || "Please try again."), type: 'error' }); 
     } finally {
         setIsLoading(false);
     }
@@ -313,9 +314,6 @@ export default function CleaningServiceApp() {
     setShowConfirmation(false); 
     
   };
-
-
-
    //Switches the view to the booking form for creating a new booking.
   const handleNewBooking = () => {
     setEditingBooking(null);
@@ -367,9 +365,13 @@ export default function CleaningServiceApp() {
        setMessage(null); 
        try {
            const updatedProfile = await API.saveUserProfile(currentUserId, profileData);
-           setUserProfile(updatedProfile); // Update user profile state
            handleCloseProfile(); // Close the modal on successful save
            setMessage({ text: "Profile updated successfully!", type: 'success' });
+
+
+          const fetchedProfile = await API.fetchUserProfile(currentUserId);
+          setUserProfile(fetchedProfile);
+           
        } catch (error) {
            console.error("Failed to save profile:", error);
            setMessage({ text: "Failed to save profile. " + (error.message || "Please try again."), type: 'error' }); 

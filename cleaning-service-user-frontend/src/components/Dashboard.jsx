@@ -60,14 +60,20 @@ function Dashboard({ bookings, services, onNewBookingClick, onEditBooking, onDel
                        </span>
                    </td>
                   <td className="py-3 px-4 whitespace-nowrap text-sm text-gray-700 flex items-center space-x-3">
-                    <button
-                      onClick={() => onEditBooking(booking)}
-                      className="text-blue-500 hover:text-blue-700 transition duration-150 ease-in-out"
-                      aria-label="Edit booking"
-                      title="Edit Booking"
-                    >
-                      <Edit className="h-4 w-4" />
-                    </button>
+                  <button
+                    onClick={() => onEditBooking(booking)}
+                    disabled={booking.status === "Completed"}
+                    className={`transition duration-150 ease-in-out ${
+                      booking.status === "Completed"
+                        ? "text-gray-400"
+                        : "text-blue-500 hover:text-blue-700"
+                    }`}
+                    aria-label="Edit booking"
+                    title="Edit Booking"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </button>
+
                     <button
                       onClick={() => onDeleteBooking(booking.id)}
                       className="text-red-500 hover:text-red-700 transition duration-150 ease-in-out"
