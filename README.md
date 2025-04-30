@@ -4,11 +4,12 @@
 
 PeoCleaner is a web application designed to facilitate cleaning service bookings. It consists of a user-facing frontend where customers can book services, manage their profiles, and view their booking status, and an administrative backend to manage all bookings and service availability.
 
+![Example image](PeoClean.png)
+
 The backend is built with Node.js, Express, and uses an SQLite database for data persistence. The frontend is a modern Single Page Application (SPA) developed using React, Vite, and styled with Tailwind CSS.
 
-![PeoCleaner Project Structure](image_c4fdbd.png)
 
-*(Insert the image you provided here. Make sure the image file `image_c4fdbd.png` is also in the root of your GitHub repository)*
+
 
 ## Features
 
