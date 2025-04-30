@@ -74,14 +74,20 @@ function Dashboard({ bookings, services, onNewBookingClick, onEditBooking, onDel
                     <Edit className="h-4 w-4" />
                   </button>
 
-                    <button
-                      onClick={() => onDeleteBooking(booking.id)}
-                      className="text-red-500 hover:text-red-700 transition duration-150 ease-in-out"
-                      aria-label="Delete booking"
-                      title="Delete Booking"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
+                  <button
+                    onClick={() => onDeleteBooking(booking.id)}
+                    disabled={booking.status === "Completed"}
+                    className={`transition duration-150 ease-in-out ${
+                      booking.status === "Completed"
+                        ? "text-gray-400"
+                        : "text-red-500 hover:text-red-700"
+                    }`}
+                    aria-label="Delete booking"
+                    title="Delete Booking"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+
                   </td>
                 </tr>
               ))}
