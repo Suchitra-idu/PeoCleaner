@@ -57,7 +57,7 @@ To get the application running locally, follow these steps:
 
 1.  Navigate into the backend directory:
     ```bash
-    cd cleaning-service-backend
+    cd server
     ```
 2.  Install backend dependencies:
     ```bash
@@ -84,7 +84,7 @@ To get the application running locally, follow these steps:
 1.  Open a **new** terminal window or tab.
 2.  Navigate into the frontend directory from the project root:
     ```bash
-    cd cleaning-service-user-frontend
+    cd client
     ```
 3.  Install frontend dependencies:
     ```bash
