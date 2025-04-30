@@ -153,7 +153,7 @@ function BookingForm({
         {/* Customer Name */}
         <div>
           <label htmlFor="customer_name" className="block text-sm font-medium text-gray-700 mb-1">
-            Customer Name
+            Name
           </label>
           <input id="customer_name" name="customer_name" type="text" value={(areAddressFieldsDisabled && userProfile) ? userProfile.default_name : formData.customer_name} onChange={onInputChange} className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${ validationErrors.customer_name ? 'border-red-500' : 'border-gray-300' } ${areAddressFieldsDisabled ? 'bg-gray-100 cursor-not-allowed' : 'hover:border-gray-400'}`} placeholder="Enter customer name" disabled={areAddressFieldsDisabled} />
           {!areAddressFieldsDisabled && validationErrors.customer_name && (

@@ -9,9 +9,7 @@ function Footer() {
             <h3 className="text-lg font-semibold text-white mb-1">PeoClean Cleaning Services</h3> 
             <p className="text-gray-400 text-sm">Professional cleaning services for your home and office</p> 
           </div>
-          <div className="text-sm text-gray-400 text-center md:text-right">
-            &copy; {new Date().getFullYear()} PeoClean. All rights reserved. 
-          </div>
+         
         </div>
       </div>
     </footer>
