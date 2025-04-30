@@ -1,20 +1,39 @@
 import React, { useState, useEffect } from 'react';
-import { User, Save, XCircle, Phone, Mail } from 'lucide-react'; // Added icons for mobile/email
+import { User, Save, XCircle, Phone, Mail } from 'lucide-react'; 
+import Message from './Message';
 
+/**
+ * UserProfileModal component allows users to view and update their profile details.
+ * It displays a modal dialog for editing default name, address, mobile number, and email,
+ * with validation and smooth transition effects.
+ *
+ * @param {Object} props
+ * @param {Object} props.userProfile - The current user profile data.
+ * @param {Function} props.onSave - Callback function called with updated profile data on save.
+ * @param {Function} props.onClose - Callback function to close the modal.
+ * @param {boolean} props.isLoading - Whether the modal is in a loading state (for save operation).
+ *
+ * @returns {JSX.Element} - A modal UI to view and update the user profile.
+ */
 function UserProfileModal({ userProfile, onSave, onClose, isLoading }) {
+
+  // Local state to hold form data for user profile.
   const [profileFormData, setProfileFormData] = useState({
     default_name: '',
     default_address_no: '',
     default_address_street: '',
     default_address_city: '',
-    mobile: '', // New state field
-    email: '' // New state field
+    mobile: '',
+    email: ''
   });
 
+
+  //if modal should appear open or not.
   const [isOpen, setIsOpen] = useState(false);
+  const [message, setMessage] = useState({ text: '', type: '' });
 
 
-  // Effect to update form data and trigger fade-in animation
+  //Effect hook to populate form data when `userProfile` changes and to trigger fade-in animation.
   useEffect(() => {
     if (userProfile) {
       setProfileFormData({
@@ -22,25 +41,29 @@ function UserProfileModal({ userProfile, onSave, onClose, isLoading }) {
         default_address_no: userProfile.default_address?.no || '',
         default_address_street: userProfile.default_address?.street || '',
         default_address_city: userProfile.default_address?.city || '',
-        mobile: userProfile.mobile || '', // Populate new field
-        email: userProfile.email || '' // Populate new field
+        mobile: userProfile.mobile || '',
+        email: userProfile.email || ''
       });
     } else {
-         setProfileFormData({
-            default_name: '',
-            default_address_no: '',
-            default_address_street: '',
-            default_address_city: '',
-            mobile: '',
-            email: ''
-          });
+      // Reset form if no user profile is provided
+      setProfileFormData({
+        default_name: '',
+        default_address_no: '',
+        default_address_street: '',
+        default_address_city: '',
+        mobile: '',
+        email: ''
+      });
     }
-     const timer = setTimeout(() => setIsOpen(true), 50);
-     return () => clearTimeout(timer);
 
+    // Trigger fade-in animation after short delay
+    const timer = setTimeout(() => setIsOpen(true), 50);
+    return () => clearTimeout(timer);
   }, [userProfile]);
 
-
+ 
+   //Handles change in form inputs and updates the local state accordingly.
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setProfileFormData({
@@ -49,61 +72,70 @@ function UserProfileModal({ userProfile, onSave, onClose, isLoading }) {
     });
   };
 
+   //Validates input fields and calls `onSave` with sanitized profile data.
   const handleSaveClick = () => {
-    // Simple validation - check new fields too
     if (
-        !profileFormData.default_name.trim() ||
-        !profileFormData.default_address_no.trim() ||
-        !profileFormData.default_address_street.trim() ||
-        !profileFormData.default_address_city.trim() ||
-        !profileFormData.mobile.trim() || // Validate new field
-        !profileFormData.email.trim() // Validate new field
-        ) {
-        alert("All profile fields (Name, Address, Mobile, Email) are required.");
-        return;
+      !profileFormData.default_name.trim() ||
+      !profileFormData.default_address_no.trim() ||
+      !profileFormData.default_address_street.trim() ||
+      !profileFormData.default_address_city.trim() ||
+      !profileFormData.mobile.trim() ||
+      !profileFormData.email.trim()
+    ) {
+      setMessage({ text: "All profile fields (Name, Address, Mobile, Email) are required.", type: 'error' });
+      return;
     }
 
-    // Basic email format check (optional)
+   //Performs simple email format check and presence validation.
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(profileFormData.email.trim())) {
-        alert("Please enter a valid email address.");
-        return;
+      setMessage({ text: "Please enter a valid email address.", type: 'error' });
+      return;
     }
 
-
     const dataToSave = {
-        default_name: profileFormData.default_name.trim(),
-        default_address: {
-            no: profileFormData.default_address_no.trim(),
-            street: profileFormData.default_address_street.trim(),
-            city: profileFormData.default_address_city.trim()
-        },
-        mobile: profileFormData.mobile.trim(), // Include new field
-        email: profileFormData.email.trim() // Include new field
+      default_name: profileFormData.default_name.trim(),
+      default_address: {
+        no: profileFormData.default_address_no.trim(),
+        street: profileFormData.default_address_street.trim(),
+        city: profileFormData.default_address_city.trim()
+      },
+      mobile: profileFormData.mobile.trim(),
+      email: profileFormData.email.trim()
     };
 
     onSave(dataToSave);
   };
 
-   const handleClose = () => {
-      setIsOpen(false);
-      setTimeout(onClose, 300);
-   }
 
+  // Handles closing the modal with animation before triggering `onClose`.
+ 
+  const handleClose = () => {
+    setIsOpen(false);
+    setTimeout(onClose, 300);
+  };
+
+
+   //CSS class for modal background with transition effects.
   const modalClasses = `
     fixed inset-0 bg-gray-900 bg-opacity-75 overflow-y-auto h-full w-full flex justify-center items-center z-50
     transition-opacity duration-300 ease-out
     ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}
   `;
 
-   const modalContentClasses = `
-     relative bg-white rounded-xl shadow-2xl p-6 sm:p-8 w-96 max-w-sm mx-4
-     transform transition-all duration-300 ease-out
-     ${isOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0'}
-   `;
+ 
+   //CSS class for modal content container with entrance/exit animation.
+
+  const modalContentClasses = `
+    relative bg-white rounded-xl shadow-2xl p-6 sm:p-8 w-96 max-w-sm mx-4
+    transform transition-all duration-300 ease-out
+    ${isOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0'}
+  `;
 
 
   return (
+    <>
+
     <div className={modalClasses}>
         <div className="absolute inset-0" onClick={isLoading ? null : handleClose}></div>
 
@@ -162,7 +194,7 @@ function UserProfileModal({ userProfile, onSave, onClose, isLoading }) {
                          <input id="default_address_city" name="default_address_city" type="text" value={profileFormData.default_address_city} onChange={handleInputChange} className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 hover:border-gray-400 text-sm" placeholder="City" disabled={isLoading} />
                      </div>
                  </div>
-              </div> {/* End Default Address group */}
+              </div>
 
               {/* Mobile Number */}
               <div>
@@ -172,7 +204,7 @@ function UserProfileModal({ userProfile, onSave, onClose, isLoading }) {
                 <input
                   id="mobile"
                   name="mobile"
-                  type="text" // Or type="tel" with pattern validation
+                  type="tel" 
                   value={profileFormData.mobile}
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 hover:border-gray-400"
@@ -189,7 +221,7 @@ function UserProfileModal({ userProfile, onSave, onClose, isLoading }) {
                 <input
                   id="email"
                   name="email"
-                  type="email" // Use type="email" for better mobile keyboards
+                  type="email"
                   value={profileFormData.email}
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 hover:border-gray-400"
@@ -199,7 +231,7 @@ function UserProfileModal({ userProfile, onSave, onClose, isLoading }) {
               </div>
 
 
-            </div> {/* End space-y-5 */}
+            </div> 
 
 
             {/* Save Button */}
@@ -214,6 +246,17 @@ function UserProfileModal({ userProfile, onSave, onClose, isLoading }) {
             </div>
           </div>
         </div>
+
+
+        {message.text && (
+      <Message
+        type={message.type}
+        text={message.text}
+        duration={4000}
+        onClose={() => setMessage({ text: '', type: '' })}
+      />
+    )}
+        </>
   );
 }
 

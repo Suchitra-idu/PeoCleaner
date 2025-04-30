@@ -1,7 +1,24 @@
 import React, { useState, useEffect, useMemo } from 'react'; 
 import { Calendar, DollarSign, Clock } from 'lucide-react'; 
 import { formatAddress, formatPrice, calculateBookingPrice, formatDate } from '../utils/helpers';
-
+/**
+ * BookingForm component allows users to book or edit a service booking.
+ * It provides options for selecting services, time slots, and addresses,
+ * while calculating total booking prices dynamically.
+ * 
+ * @param {Object} props
+ * @param {Object} props.formData - The current form data (e.g., address, services, date).
+ * @param {Array} props.services - List of available services that can be selected for the booking.
+ * @param {Array} props.availableSlots - List of available time slots for the booking.
+ * @param {Object} props.validationErrors - Validation error messages to display on the form.
+ * @param {Function} props.onInputChange - Function to handle changes in form input fields (e.g., address).
+ * @param {Function} props.onSubmit - Callback function triggered on form submission.
+ * @param {Function} props.onCancel - Callback function triggered when the form is canceled.
+ * @param {Boolean} props.editingBooking - Boolean indicating whether the form is for editing an existing booking.
+ * @param {Object} props.userProfile - User's profile data, including address.
+ * 
+ * @returns {JSX.Element} - A form for creating or editing a booking.
+ */
 function BookingForm({
   formData,
   services,
@@ -20,6 +37,7 @@ function BookingForm({
     const [selectedServiceIds, setSelectedServiceIds] = useState([]);
     //Store the selected time slot
     const [selectedSlotId, setSelectedSlotId] = useState('');
+    const [selectedDate, setSelectedDate] = useState('');
 
     // Handle initial state and populate form when editing
     useEffect(() => {
@@ -91,21 +109,21 @@ function BookingForm({
     const selectedBookingServices = selectedServiceIds.map(id => ({ service_id: parseInt(id), quantity: 1 }));
     const totalPrice = calculateBookingPrice(selectedBookingServices, services);
 
-    //Group available slots by date
+    // Groups the time slots by date so they can be displayed in a user friendly manner
     const slotsGroupedByDate = useMemo(() => {
         const groups = {};
         availableSlots.forEach(slot => {
-            // Extract date part (YYYY-MM-DD) for grouping
-            const dateKey = slot.dateTime.split('T')[0];
-            if (!groups[dateKey]) {
-                groups[dateKey] = [];
-            }
-            groups[dateKey].push(slot);
+          const dateKey = slot.dateTime.split('T')[0];
+          if (!groups[dateKey]) {
+            groups[dateKey] = [];
+          }
+          groups[dateKey].push(slot);
         });
-        // Sort dates
+      
+        // Sort and convert the object into an array
         return Object.entries(groups).sort(([dateA], [dateB]) => new Date(dateA) - new Date(dateB));
-    }, [availableSlots]); // Recalculate only when availableSlots changes
-
+      }, [availableSlots]);
+      
 
   return (
     <div className="bg-white rounded-xl shadow-2xl p-6 sm:p-8">
@@ -149,7 +167,7 @@ function BookingForm({
           )}
         </div>
 
-        {/* Address - 3 separate inputs */}
+        {/* Address with 3 separate inputs */}
         <div>
            <span className="block text-sm font-medium text-gray-700 mb-2">Service Address</span>
            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6">
@@ -173,10 +191,10 @@ function BookingForm({
             {useProfileAddress && !editingBooking && userProfile && (
                  <p className="mt-2 text-sm text-gray-500">Using profile address: {userProfile.default_address ? formatAddress(userProfile.default_address) : 'N/A'}</p>
             )}
-        </div> {/* End Address group */}
+        </div>
 
 
-        {/* Service Type - Checkboxes */}
+        {/* Select service type*/}
         <div>
            <label className="block text-sm font-medium text-gray-700 mb-2">
              Select Service(s)
@@ -201,57 +219,77 @@ function BookingForm({
             {validationErrors.services && (
               <p className="mt-1 text-sm text-red-500">{validationErrors.services}</p>
             )}
-        </div> {/* End Service Selection */}
+        </div>
 
-         {/* Available Date and Time Slots - Enhanced UI */}
+        {/* Select time slot */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-3 flex items-center"> {/* Increased bottom margin */}
-            <Clock className="mr-2 h-5 w-5 text-gray-600"/> Select an Available Slot
-          </label>
-           {availableSlots.length > 0 ? (
-               <div className={`space-y-4 ${validationErrors.date_time ? 'border border-red-500 p-3 rounded' : ''}`}> {/* Add error border */}
-                   {slotsGroupedByDate.map(([dateKey, slots]) => (
-                       <div key={dateKey}>
-                           {/* Display the Date Header */}
-                           <h4 className="text-md font-semibold text-gray-800 mb-2 border-b border-gray-200 pb-1">
-                               {formatDate(dateKey)} {/* Use formatDate for the header */}
-                           </h4>
-                           {/* Display Time Slots for this Date */}
-                           <div className="flex flex-wrap gap-3"> {/* Flex wrap for time blocks */}
-                               {slots.map(slot => (
-                                   <button
-                                       key={slot.id}
-                                       type="button" // Use button type
-                                       onClick={() => handleSlotClick(slot.id)}
-                                       className={`
-                                           px-4 py-2 border rounded-md text-sm font-medium transition duration-150 ease-in-out
-                                           ${selectedSlotId.toString() === slot.id.toString() // Check if this slot is selected
-                                               ? 'bg-blue-600 text-white border-blue-600 shadow-md' // Selected state
-                                               : 'bg-white text-gray-700 border-gray-300 hover:border-blue-400 hover:text-blue-600' // Default state
-                                           }
-                                           ${slot.slotsAvailable === 0 ? 'opacity-50 cursor-not-allowed line-through' : ''} // Style for unavailable slots
-                                       `}
-                                       disabled={slot.slotsAvailable === 0} // Disable if no slots left
-                                   >
-                                       {/* Format time part of the slot date */}
-                                       {formatDate(slot.dateTime).split(', ')[2]} ({slot.slotsAvailable} left) {/* Display time and availability */}
-                                   </button>
-                               ))}
-                           </div>
-                       </div>
-                   ))}
-               </div>
-           ) : (
-               <p className="text-gray-600 p-3 border rounded-md bg-gray-50">No available slots found. Please check back later.</p>
-           )}
-           {validationErrors.date_time && (
-             <p className="mt-1 text-sm text-red-500">{validationErrors.date_time}</p>
-           )}
-        </div> {/* End Available Slots */}
+        <label className="block text-sm font-medium text-gray-700 mb-3 flex items-center">
+            <Clock className="mr-2 h-5 w-5 text-gray-600" /> Select a Date
+        </label>
+
+        {/*  Show available dates */}
+        <div className="flex flex-wrap gap-3 mb-4">
+            {slotsGroupedByDate.map(([dateKey]) => (
+            <button
+                key={dateKey}
+                type="button"
+                onClick={() => setSelectedDate(dateKey)}
+                className={`
+                px-4 py-2 border rounded-md text-sm font-medium transition duration-150 ease-in-out
+                ${selectedDate === dateKey
+                    ? 'bg-blue-600 text-white border-blue-600 shadow-md'
+                    : 'bg-white text-gray-700 border-gray-300 hover:border-blue-400 hover:text-blue-600'}
+                `}
+            >
+                {formatDate(dateKey).split(', ')[0]} {/* Display "Monday", "Tuesday", etc. */}
+            </button>
+            ))}
+        </div>
+
+        {/* Show time slots for selected date */}
+        {selectedDate && slotsGroupedByDate.some(([date]) => date === selectedDate) ? (
+            <div className={`space-y-2 ${validationErrors.date_time ? 'border border-red-500 p-3 rounded' : ''}`}>
+            <h4 className="text-md font-semibold text-gray-800 mb-2 border-b border-gray-200 pb-1">
+                Available Times for {formatDate(selectedDate)}
+            </h4>
+            <div className="flex flex-wrap gap-3">
+                {slotsGroupedByDate.find(([date]) => date === selectedDate)[1].map(slot => (
+                <button
+                    key={slot.id}
+                    type="button"
+                    onClick={() => handleSlotClick(slot.id)}
+                    className={`
+                    px-4 py-2 border rounded-md text-sm font-medium transition duration-150 ease-in-out
+                    ${selectedSlotId.toString() === slot.id.toString()
+                        ? 'bg-blue-600 text-white border-blue-600 shadow-md'
+                        : 'bg-white text-gray-700 border-gray-300 hover:border-blue-400 hover:text-blue-600'}
+                    ${slot.slotsAvailable === 0 ? 'opacity-50 cursor-not-allowed line-through' : ''}
+                    `}
+                    disabled={slot.slotsAvailable === 0}
+                >
+                    {formatDate(slot.dateTime).split(', ')[2]} ({slot.slotsAvailable} left)
+                </button>
+                ))}
+            </div>
+            </div>
+        ) : (
+            selectedDate && (
+            <p className="text-gray-600 p-3 border rounded-md bg-gray-50">
+                No slots available for the selected date.
+            </p>
+            )
+        )}
+
+        {/* Validation error display */}
+        {validationErrors.date_time && (
+            <p className="mt-1 text-sm text-red-500">{validationErrors.date_time}</p>
+        )}
+        </div>
+
 
 
         {/* Calculated Price Display */}
-        {selectedServiceIds.length > 0 && services && ( // Ensure services are loaded
+        {selectedServiceIds.length > 0 && services && ( 
              <div className="flex items-center justify-end text-lg font-semibold text-gray-800 mt-4 pt-4 border-t border-gray-200">
                  <DollarSign className="mr-2 h-6 w-6 text-green-600" />
                  Total Price: <span className="ml-2 text-green-600">{formatPrice(totalPrice)}</span>
