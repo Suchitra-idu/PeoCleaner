@@ -2,7 +2,7 @@
 
 ## Project Description
 
-PeoCleaner is a web application designed to facilitate cleaning service bookings. It consists of a user-facing frontend where customers can book services, manage their profiles, and view their booking status, and an administrative backend to manage all bookings and service availability.
+PeoCleaner is a web application designed to facilitate cleaning service bookings. It consists of a user-facing frontend where customers can book services, manage their profiles, and view their booking status.
 
 ![Example image](PeoClean.png)
 
@@ -50,7 +50,7 @@ To get the application running locally, follow these steps:
 
 ### Prerequisites
 
-* Node.js and npm installed on your machine. You can download them from [https://nodejs.org/](https://nodejs.org/). It's recommended to use an LTS version.
+* Node.js and npm installed on your machine. You can download them from [https://nodejs.org/](https://nodejs.org/).
 * A terminal (Command Prompt, PowerShell, Git Bash, WSL, etc.).
 
 ### 1. Backend Setup
